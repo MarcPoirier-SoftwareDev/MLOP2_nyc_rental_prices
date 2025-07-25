@@ -7,8 +7,10 @@ import logging
 import pandas as pd
 import wandb
 import tempfile
+import os
 from sklearn.model_selection import train_test_split
 from wandb_utils.log_artifact import log_artifact
+
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)-15s %(message)s")
 logger = logging.getLogger()
@@ -37,17 +39,20 @@ def go(args):
     # Save to output files
     for df, k in zip([trainval, test], ['trainval', 'test']):
         logger.info(f"Uploading {k}_data.csv dataset")
-        with tempfile.NamedTemporaryFile("w") as fp:
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, encoding='utf-8') as fp: # Add delete=False
 
-            df.to_csv(fp.name, index=False)
+            df.to_csv(fp, index=False)  # Write to fp (file object), not fp.name
+            fp.close()  # Explicitly close to release lock
 
             log_artifact(
                 f"{k}_data.csv",
                 f"{k}_data",
                 f"{k} split of dataset",
-                fp.name,
+                fp.name, # Safe to use path now
                 run,
             )
+            # Manual cleanup
+            os.remove(fp.name)
 
 
 if __name__ == "__main__":
