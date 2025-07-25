@@ -90,14 +90,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "--min_price",
         type=float,
-        help="minimum rental price to consider",
+        help="minimum rental price to be considered",
         required=True
     )
 
     parser.add_argument(
         "--max_price",
         type=float,
-        help="maximum rental price to consider",
+        help="maximum rental price to be considered",
         required=True
     )
 
